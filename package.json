@@ -1,0 +1,9 @@
+{
+  "name": "pinch-unicode",
+  "version": "1.0.0",
+  "description": "Unicode utility library for Pinch",
+  "main": "index.js",
+  "repository": "git@github.com:pinch-data/unicode.git",
+  "author": "Joost Lubach <joostlubach@gmail.com>",
+  "license": "MIT"
+}

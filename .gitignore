@@ -1,0 +1,17 @@
+# OSX
+#
+.DS_Store
+
+# Editor
+.vscode
+
+# Dist
+dist/
+build/
+
+# Caches
+.sass-cache
+
+# Libraries & NPM
+node_modules/
+npm-debug.log
