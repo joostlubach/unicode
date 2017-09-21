@@ -34,6 +34,7 @@ export default class StringStream {
 		this.codePoints = this.string.codePoints
 	}
 
+	string:     UnicodeString
 	characters: string[]
 	codePoints: number[]
 	pos         = 0
@@ -61,7 +62,7 @@ export default class StringStream {
 	/**
 	 * Gets the remainder of the string from the current position.
 	 */
-	get remainder() {
+	get remainder(): string {
 		return this.slice(this.pos)
 	}
 
@@ -78,7 +79,7 @@ export default class StringStream {
 	/**
 	 * Returns the next (count) characters and advances, if possible.
 	 */
-	next(count = 1): string {
+	next(count: number = 1): ?UnicodeString {
 		if (this.pos > this.characters.length - count) {
 			return null
 		}
@@ -102,7 +103,7 @@ export default class StringStream {
 	 * Creates a slice of our string. Use this instead of `this.string.slice`, as this version supports
 	 * unicode.
 	 */
-	slice(base: number, extent = -1, multiline = false) {
+	slice(base: number, extent: number = -1, multiline: boolean = false): string {
 		if (extent < 0) {
 			extent += this.characters.length + 1
 		}
@@ -122,7 +123,7 @@ export default class StringStream {
 	 * Creates a substring of our string. Use this instead of `this.string.substr` as this version
 	 * supports unicode.
 	 */
-	substr(start: number, length: number, multiline = false) {
+	substr(start: number, length: number, multiline: boolean = false) {
 		return this.slice(start, start + length, multiline)
 	}
 
@@ -161,7 +162,7 @@ export default class StringStream {
 	 * @returns
 	 *   The content of the match, or `null` if the match failed.
 	 */
-	match(predicate: Predicate, lookahead = 0, multiline = false): ?string {
+	match(predicate: Predicate, lookahead: number = 0, multiline: boolean = false): ?string {
 		if (predicate instanceof RegExp) {
 			const match = this.slice(this.pos + lookahead, -1, multiline).match(predicate)
 			return match != null && match.index === 0 ? match[0] : null
@@ -181,7 +182,7 @@ export default class StringStream {
 	 * @param count
 	 *   The number of characters to peek.
 	 */
-	peek(count = 1): string {
+	peek(count: number = 1): ?string {
 		if (this.pos > this.characters.length - count) {
 			return null
 		} else {
@@ -203,7 +204,7 @@ export default class StringStream {
 	 * @returns
 	 *   The eaten string, or `null` if there was no match.
 	 */
-	eat(predicate: Predicate, multiline = false): ?string {
+	eat(predicate: Predicate, multiline: boolean = false): ?string {
 		if (predicate instanceof RegExp) {
 			const match = this.slice(this.pos, -1, multiline).match(predicate)
 			if (match != null && match.index === 0) {
