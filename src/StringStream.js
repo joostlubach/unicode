@@ -292,7 +292,7 @@ export default class StringStream {
 	/**
 	 * Skips until EOL.
 	 */
-	eatUntilEol(): boolean {
+	eatUntilEOL(): boolean {
 		const prev = this.pos
 		while (!this.eol) {
 			this.next()
