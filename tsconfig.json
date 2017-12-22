@@ -4,9 +4,9 @@
     "target": "es2015",
     "module": "commonjs",
 
-    "allowJs": true,
     "allowSyntheticDefaultImports": true,
     "sourceMap": true,
+    "declaration": true,
     
 		"strict": true,
     "experimentalDecorators": true,
