@@ -6,7 +6,7 @@
 .vscode
 
 # Dist
-dist/
+lib/
 build/
 
 # Caches

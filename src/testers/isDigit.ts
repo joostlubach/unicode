@@ -1,9 +1,9 @@
-// @flow
-
-export default function isDigit(ch: ?string): boolean {
+export default function isDigit(ch: string | null): boolean {
 	if (ch == null) { return false }
 
 	const code = ch.codePointAt(0)
+	if (code == null) { return false }
+
 	return false ||
 		(code >= 0x0030 && code <= 0x0039) ||
 		(code >= 0x0660 && code <= 0x0669) ||

@@ -1,5 +1,3 @@
-// @flow
-
 export default class Range {
 
 	constructor(base: number, extent: number) {

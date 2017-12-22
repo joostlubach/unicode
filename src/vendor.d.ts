@@ -1,0 +1,1 @@
+declare module 'unicode-tr51/Emoji'

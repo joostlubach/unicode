@@ -1,9 +1,9 @@
-// @flow
-
-export default function isCombiningMark(ch: ?string): boolean {
+export default function isCombiningMark(ch: string | null): boolean {
 	if (ch == null) { return false }
 
 	const code = ch.codePointAt(0)
+	if (code == null) { return false }
+
 	return false ||
 		(code >= 0x0300 && code <= 0x036F) ||
 		(code >= 0x0483 && code <= 0x0487) ||

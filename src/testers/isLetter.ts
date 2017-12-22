@@ -1,9 +1,9 @@
-// @flow
-
-export default function isLetter(ch: ?string): boolean {
+export default function isLetter(ch: string | null): boolean {
 	if (ch == null) { return false }
 
 	const code = ch.codePointAt(0)
+	if (code == null) { return false }
+
 	return false ||
 		(code >= 0x0041 && code <= 0x005A) ||
 		(code >= 0x0061 && code <= 0x007A) ||

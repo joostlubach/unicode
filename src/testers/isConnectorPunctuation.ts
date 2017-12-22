@@ -1,9 +1,9 @@
-// @flow
-
-export default function isConnectorPunctuation(ch: ?string): boolean {
+export default function isConnectorPunctuation(ch: string | null): boolean {
 	if (ch == null) { return false }
 
 	const code = ch.codePointAt(0)
+	if (code == null) { return false }
+
 	return false ||
 		code === 0x005F ||
 		code === 0x203F ||

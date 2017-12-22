@@ -1,0 +1,30 @@
+{
+  "compilerOptions": {
+    "outDir": "lib",
+    "target": "es2015",
+    "module": "commonjs",
+
+    "allowJs": true,
+    "allowSyntheticDefaultImports": true,
+    "sourceMap": true,
+    
+		"strict": true,
+    "experimentalDecorators": true,
+
+		"moduleResolution": "node",
+		"baseUrl": "."
+  },
+  "include": [
+    "src/types/*",
+    "src/**/*"
+  ],
+  "exclude": [
+    "node_modules",
+    "build",
+    "scripts",
+    "acceptance-tests",
+    "webpack",
+    "jest",
+    "src/setupTests.ts"
+  ]
+}

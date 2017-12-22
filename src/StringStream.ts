@@ -1,11 +1,9 @@
-// @flow
-
 // Many thanks to Mathias Bynens for this research, and all the emoji code points.
 // https://mathiasbynens.be/notes/javascript-unicode
 
 import UnicodeString from './UnicodeString'
 import Range from './Range'
-import type {Token, Predicate} from '..'
+import {Token, Predicate} from '.'
 
 const CHARS = {
 	whitespace: [0x0009, 0x000B, 0x000C, 0x000D, 0x0020, 0x0085, 0x00A0, 0x1680, 0x2000, 0x2001, 0x2002, 0x2003, 0x2004, 0x2005, 0x2006, 0x2007, 0x2008, 0x2009, 0x200A, 0x2028, 0x2029, 0x202F, 0x205F, 0x3000],
@@ -79,7 +77,7 @@ export default class StringStream {
 	/**
 	 * Returns the next (count) characters and advances, if possible.
 	 */
-	next(count: number = 1): ?UnicodeString {
+	next(count: number = 1): string | null {
 		if (this.pos > this.characters.length - count) {
 			return null
 		}
@@ -110,7 +108,7 @@ export default class StringStream {
 
 		let text = ''
 		for (let i = base; i < extent; i++) {
-			if (!multiline && this.characters[i] === CHARS.newline) {
+			if (!multiline && this.characters[i].codePointAt(0) === CHARS.newline) {
 				break
 			}
 
@@ -123,7 +121,7 @@ export default class StringStream {
 	 * Creates a substring of our string. Use this instead of `this.string.substr` as this version
 	 * supports unicode.
 	 */
-	substr(start: number, length: number, multiline: boolean = false) {
+	substr(start: number, length: number, multiline: boolean = false): string {
 		return this.slice(start, start + length, multiline)
 	}
 
@@ -162,18 +160,21 @@ export default class StringStream {
 	 * @returns
 	 *   The content of the match, or `null` if the match failed.
 	 */
-	match(predicate: Predicate, lookahead: number = 0, multiline: boolean = false): ?string {
+	match(predicate: Predicate, lookahead: number = 0, multiline: boolean = false): string | null {
 		if (predicate instanceof RegExp) {
 			const match = this.slice(this.pos + lookahead, -1, multiline).match(predicate)
 			return match != null && match.index === 0 ? match[0] : null
 		} else if (predicate instanceof Function) {
-			if (predicate(this.peek())) {
+			const nextChar = this.peek()
+			if (nextChar && predicate(nextChar)) {
 				return this.substr(this.pos - 1, 1)
 			}
 		} else {
 			const slice = this.substr(this.pos + lookahead, predicate.length, multiline)
 			return slice === predicate ? slice : null
 		}
+
+		return null
 	}
 
 	/**
@@ -182,7 +183,7 @@ export default class StringStream {
 	 * @param count
 	 *   The number of characters to peek.
 	 */
-	peek(count: number = 1): ?string {
+	peek(count: number = 1): string | null {
 		if (this.pos > this.characters.length - count) {
 			return null
 		} else {
@@ -204,7 +205,7 @@ export default class StringStream {
 	 * @returns
 	 *   The eaten string, or `null` if there was no match.
 	 */
-	eat(predicate: Predicate, multiline: boolean = false): ?string {
+	eat(predicate: Predicate, multiline: boolean = false): string | null {
 		if (predicate instanceof RegExp) {
 			const match = this.slice(this.pos, -1, multiline).match(predicate)
 			if (match != null && match.index === 0) {
@@ -212,7 +213,8 @@ export default class StringStream {
 				return match[0]
 			}
 		} else if (predicate instanceof Function) {
-			if (predicate(this.peek(), this)) {
+			const nextChar = this.peek()
+			if (nextChar != null && predicate(nextChar)) {
 				this.pos += 1
 				return this.substr(this.pos - 1, 1)
 			}
@@ -263,7 +265,7 @@ export default class StringStream {
 	 */
 	eatCodePoints(...codes: number[]): boolean {
 		const prev = this.pos
-		while (!this.eos && codes.includes(this.codePoints[this.pos])) {
+		while (!this.eos && codes.indexOf(this.codePoints[this.pos]) !== -1) {
 			this.pos++
 		}
 		return this.pos > prev

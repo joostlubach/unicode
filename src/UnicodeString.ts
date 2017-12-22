@@ -1,5 +1,3 @@
-// @flow
-
 import {isSpace} from './testers'
 import Range from './Range'
 
@@ -43,7 +41,7 @@ export default class UnicodeString {
 	/// The code points in the string.
 	get codePoints(): number[] {
 		if (this.codePointsCache == null) {
-			this.codePointsCache = this.characters.map(c => c.codePointAt(0))
+			this.codePointsCache = this.characters.map(c => c.codePointAt(0) as number)
 		}
 		return this.codePointsCache
 	}
@@ -56,16 +54,16 @@ export default class UnicodeString {
 		return this.codePoints[pos]
 	}
 
-	charactersCache: ?Array<string> = null
-	codePointsCache: ?Array<number> = null
+	charactersCache: string[] | null = null
+	codePointsCache: number[] | null = null
 
 	//------
 	// Position converting
 
-	ctpCache: ?Array<number> = null
+	ctpCache: number[] | null = null
 
 	/// Converts a character index to a (native) string position.
-	characterIndexToPos(index: number): ?number {
+	characterIndexToPos(index: number): number | null {
 		if (this.ctpCache == null) {
 			this.ctpCache = []
 			for (let i = 0, pos = 0; i < this.characters.length; i++) {
@@ -87,7 +85,7 @@ export default class UnicodeString {
 	// Methods
 
 	/// Slices the string. See `String.slice`.
-	slice(base: number, extent: number): UnicodeString {
+	slice(base: number, extent?: number): UnicodeString {
 		const chars = this.characters.slice(base, extent)
 		return new UnicodeString(chars.join(''))
 	}
