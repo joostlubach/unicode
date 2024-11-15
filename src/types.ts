@@ -1,4 +1,4 @@
-import {Range} from '.'
+import { Range } from './'
 
 export interface Token {
   range: Range

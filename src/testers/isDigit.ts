@@ -1,10 +1,10 @@
 export default function isDigit(ch: string | null): boolean {
-	if (ch == null) { return false }
+  if (ch == null) { return false }
 
-	const code = ch.codePointAt(0)
-	if (code == null) { return false }
+  const code = ch.codePointAt(0)
+  if (code == null) { return false }
 
-	return false ||
+  return false ||
 		(code >= 0x0030 && code <= 0x0039) ||
 		(code >= 0x0660 && code <= 0x0669) ||
 		(code >= 0x06F0 && code <= 0x06F9) ||
