@@ -28,6 +28,7 @@ export default class StringStream {
     } else {
       this.string = new UnicodeString(source)
     }
+
     this.characters = this.string.characters
     this.codePoints = this.string.codePoints
   }
@@ -102,16 +103,22 @@ export default class StringStream {
 	 * unicode.
 	 */
   slice(base: number, extent: number = -1, multiline: boolean = false): string {
+    const length = this.characters.length
     if (extent < 0) {
-      extent += this.characters.length + 1
+      extent += length + 1
     }
 
+    if (base < 0) {
+      throw new Error('Base cannot be negative')
+    }
+    const end = Math.min(length, extent)
+
     let text = ''
-    for (let i = base; i < extent; i++) {
+    for (let i = base; i < end; i++) {
       if (!multiline && this.characters[i].codePointAt(0) === CHARS.newline) {
         break
       }
-
+    
       text += this.characters[i]
     }
     return text
@@ -167,7 +174,7 @@ export default class StringStream {
     } else if (predicate instanceof Function) {
       const nextChar = this.peek()
       if (nextChar && predicate(nextChar)) {
-        return this.substr(this.pos - 1, 1)
+        return this.substr(this.pos, 1)
       }
     } else {
       const slice = this.substr(this.pos + lookahead, predicate.length, multiline)
