@@ -222,7 +222,7 @@ export default class StringStream {
 	 * @returns
 	 *   The eaten string, or `null` if there was no match.
 	 */
-  public eat(predicate: Predicate, multiline: boolean = false): string | null {
+  public eat(predicate: Predicate): string | null {
     if (predicate instanceof RegExp) {
       const match = this.slice(this.pos, -1).match(predicate)
       if (match != null && match.index === 0) {
