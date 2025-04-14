@@ -8,3 +8,7 @@ export interface Token {
 }
 
 export type Predicate = string | RegExp | ((ch: string) => boolean)
+
+export interface StringStreamOptions {
+  multiline?: boolean
+}

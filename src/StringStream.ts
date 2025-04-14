@@ -4,6 +4,7 @@
 import { Predicate, Token } from './'
 import Range from './Range'
 import UnicodeString from './UnicodeString'
+import { StringStreamOptions } from './types'
 
 const CHARS = {
   whitespace: [0x0009, 0x000B, 0x000C, 0x000D, 0x0020, 0x0085, 0x00A0, 0x1680, 0x2000, 0x2001, 0x2002, 0x2003, 0x2004, 0x2005, 0x2006, 0x2007, 0x2008, 0x2009, 0x200A, 0x2028, 0x2029, 0x202F, 0x205F, 0x3000],
@@ -18,7 +19,10 @@ export default class StringStream {
   //------
   // Constructor & properties
 
-  constructor(source: string | UnicodeString | StringStream) {
+  constructor(
+    source: string | UnicodeString | StringStream,
+    private readonly options: StringStreamOptions = {}
+  ) {
     if (source instanceof UnicodeString) {
       this.string = source
     } else if (source instanceof StringStream) {
@@ -33,35 +37,40 @@ export default class StringStream {
     this.codePoints = this.string.codePoints
   }
 
-  string:     UnicodeString
-  characters: string[]
-  codePoints: number[]
-  pos = 0
-  start = 0
+  public readonly string:     UnicodeString
+  public readonly characters: string[]
+  public readonly codePoints: number[]
+
+  public get multiline() {
+    return this.options.multiline ?? true
+  }
+
+  private pos = 0
+  private start = 0
 
   /** Start of string. */
-  get sos(): boolean { return this.pos === 0 }
+  public get sos(): boolean { return this.pos === 0 }
 
   /** End of string. */
-  get eos(): boolean { return this.pos >= this.characters.length }
+  public get eos(): boolean { return this.pos >= this.characters.length }
 
   /** Start of line. */
-  get sol(): boolean { return this.sos || this.codePoints[this.pos - 1] === CHARS.newline }
+  public get sol(): boolean { return this.sos || this.codePoints[this.pos - 1] === CHARS.newline }
 
   /** End of line. */
-  get eol(): boolean { return this.eos || this.codePoints[this.pos] === CHARS.newline }
+  public get eol(): boolean { return this.eos || this.codePoints[this.pos] === CHARS.newline }
 
   /**
 	 * Gets the current stream range.
 	 */
-  get range(): Range {
+  public get range(): Range {
     return new Range(this.start, this.pos)
   }
 
   /**
 	 * Gets the remainder of the string from the current position.
 	 */
-  get remainder(): string {
+  public get remainder(): string {
     return this.slice(this.pos)
   }
 
@@ -71,14 +80,14 @@ export default class StringStream {
   /**
 	 * Marks the current position as the start position for slicing.
 	 */
-  markStart() {
+  public markStart() {
     this.start = this.pos
   }
 
   /**
 	 * Returns the next (count) characters and advances, if possible.
 	 */
-  next(count: number = 1): string | null {
+  public next(count: number = 1): string | null {
     if (this.pos > this.characters.length - count) {
       return null
     }
@@ -90,7 +99,7 @@ export default class StringStream {
   /**
 	 * Resets the stream back to its default.
 	 */
-  reset() {
+  public reset() {
     this.pos = 0
     this.start = 0
   }
@@ -102,7 +111,7 @@ export default class StringStream {
 	 * Creates a slice of our string. Use this instead of `this.string.slice`, as this version supports
 	 * unicode.
 	 */
-  slice(base: number, extent: number = -1, multiline: boolean = false): string {
+  public slice(base: number, extent: number = -1): string {
     const length = this.characters.length
     if (extent < 0) {
       extent += length + 1
@@ -115,7 +124,7 @@ export default class StringStream {
 
     let text = ''
     for (let i = base; i < end; i++) {
-      if (!multiline && this.characters[i].codePointAt(0) === CHARS.newline) {
+      if (!this.multiline && this.characters[i].codePointAt(0) === CHARS.newline) {
         break
       }
     
@@ -128,8 +137,8 @@ export default class StringStream {
 	 * Creates a substring of our string. Use this instead of `this.string.substr` as this version
 	 * supports unicode.
 	 */
-  substr(start: number, length: number, multiline: boolean = false): string {
-    return this.slice(start, start + length, multiline)
+  public substr(start: number, length: number): string {
+    return this.slice(start, start + length)
   }
 
   //------
@@ -139,14 +148,14 @@ export default class StringStream {
 	 * Gets the current slice of the string, that is, the slice between the slice start position
 	 * and the current position.
 	 */
-  current() {
+  public current() {
     return this.slice(this.start, this.pos)
   }
 
   /**
 	 * Creates a token from the current stream state.
 	 */
-  token(extra: Object): Token {
+  public token(extra: Object): Token {
     return {
       range: this.range,
       text:  this.current(),
@@ -160,6 +169,7 @@ export default class StringStream {
   /**
 	 * Matches the given predicate, returning the content, but does not advance the position.
 	 *
+   * 
 	 * @param predicate
 	 *   A string or regular expression to look for.
 	 * @param multiline
@@ -167,9 +177,9 @@ export default class StringStream {
 	 * @returns
 	 *   The content of the match, or `null` if the match failed.
 	 */
-  match(predicate: Predicate, lookahead: number = 0, multiline: boolean = false): string | null {
+  public match(predicate: Predicate, lookahead: number = 0): string | null {
     if (predicate instanceof RegExp) {
-      const match = this.slice(this.pos + lookahead, -1, multiline).match(predicate)
+      const match = this.slice(this.pos + lookahead, -1).match(predicate)
       return match != null && match.index === 0 ? match[0] : null
     } else if (predicate instanceof Function) {
       const nextChar = this.peek()
@@ -177,7 +187,7 @@ export default class StringStream {
         return this.substr(this.pos, 1)
       }
     } else {
-      const slice = this.substr(this.pos + lookahead, predicate.length, multiline)
+      const slice = this.substr(this.pos + lookahead, predicate.length)
       return slice === predicate ? slice : null
     }
 
@@ -190,7 +200,7 @@ export default class StringStream {
 	 * @param count
 	 *   The number of characters to peek.
 	 */
-  peek(count: number = 1): string | null {
+  public peek(count: number = 1): string | null {
     if (this.pos > this.characters.length - count) {
       return null
     } else {
@@ -212,9 +222,9 @@ export default class StringStream {
 	 * @returns
 	 *   The eaten string, or `null` if there was no match.
 	 */
-  eat(predicate: Predicate, multiline: boolean = false): string | null {
+  public eat(predicate: Predicate, multiline: boolean = false): string | null {
     if (predicate instanceof RegExp) {
-      const match = this.slice(this.pos, -1, multiline).match(predicate)
+      const match = this.slice(this.pos, -1).match(predicate)
       if (match != null && match.index === 0) {
         this.pos += match[0].length
         return match[0]
@@ -226,7 +236,7 @@ export default class StringStream {
         return this.substr(this.pos - 1, 1)
       }
     } else {
-      const slice = this.substr(this.pos, predicate.length, multiline)
+      const slice = this.substr(this.pos, predicate.length)
       if (slice === predicate) {
         this.pos += predicate.length
         return slice
@@ -242,7 +252,7 @@ export default class StringStream {
 	 * @returns
 	 *   Whether whitespace was found.
 	 */
-  eatSpace(): boolean {
+  public eatSpace(): boolean {
     return this.eatCodePoints(...CHARS.whitespace)
   }
 
@@ -254,7 +264,7 @@ export default class StringStream {
 	 * @returns
 	 *   Whether any of the given characters were found.
 	 */
-  eatChars(chars: string): boolean {
+  public eatChars(chars: string): boolean {
     const codes = []
     for (let i = 0; i < chars.length; i++) {
       codes.push(chars.charCodeAt(i))
@@ -270,7 +280,7 @@ export default class StringStream {
 	 * @returns
 	 *   Whether any of the given characters were found.
 	 */
-  eatCodePoints(...codes: number[]): boolean {
+  public eatCodePoints(...codes: number[]): boolean {
     const prev = this.pos
     while (!this.eos && codes.indexOf(this.codePoints[this.pos]) !== -1) {
       this.pos++
@@ -281,7 +291,7 @@ export default class StringStream {
   /**
 	 * Skips while the given predicate matches.
 	 */
-  eatWhile(predicate: Predicate): boolean {
+  public eatWhile(predicate: Predicate): boolean {
     const prev = this.pos
     while (this.eat(predicate)) {}
     return this.pos > prev
@@ -290,7 +300,7 @@ export default class StringStream {
   /**
 	 * Skips until the predicate matches.
 	 */
-  eatUntil(predicate: Predicate): boolean {
+  public eatUntil(predicate: Predicate): boolean {
     const prev = this.pos
     while (!this.match(predicate)) {
       this.next()
@@ -301,7 +311,7 @@ export default class StringStream {
   /**
 	 * Skips until EOL.
 	 */
-  eatUntilEOL(): boolean {
+  public eatUntilEOL(): boolean {
     const prev = this.pos
     while (!this.eol) {
       this.next()
@@ -312,7 +322,7 @@ export default class StringStream {
   /**
 	 * Skips until EOS.
 	 */
-  eatUntilEos(): boolean {
+  public eatUntilEos(): boolean {
     const prev = this.pos
     this.pos = this.characters.length
     return this.pos > prev
