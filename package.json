@@ -14,7 +14,7 @@
     "test": "NODE_ENV=test DATA_ENV=test jest"
 },
 "devDependencies": {
-    "typescript": "^5.6.3"
+    "typescript": "^5.8.3"
   },
   "dependencies": {
     "@unicode/unicode-16.0.0": "^1.6.5"
