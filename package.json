@@ -30,9 +30,11 @@
     "react-dom": "^19.1"
   },
   "dependencies": {
-    "@unicode/unicode-16.0.0": "^1.6.12"
+    "@unicode/unicode-16.0.0": "^1.6.12",
+    "lodash": "^4.17.21"
   },
   "devDependencies": {
+    "@types/lodash": "^4.17.20",
     "copyfiles": "^2.4.1",
     "rimraf": "^5.0.5",
     "typescript": "5.8.3"
