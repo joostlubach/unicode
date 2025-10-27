@@ -21,7 +21,7 @@ export default class StringStream {
 
   constructor(
     source: string | UnicodeString | StringStream,
-    private readonly options: StringStreamOptions = {}
+    private readonly options: StringStreamOptions = {},
   ) {
     if (source instanceof UnicodeString) {
       this.string = source
