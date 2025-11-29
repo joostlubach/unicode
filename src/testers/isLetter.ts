@@ -1,4 +1,4 @@
-export default function isLetter(ch: string | null): boolean {
+export function isLetter(ch: string | null): boolean {
   if (ch == null) { return false }
 
   const code = ch.codePointAt(0)
