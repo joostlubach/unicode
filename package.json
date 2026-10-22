@@ -26,8 +26,8 @@
     "test": "vitest"
   },
   "peerDependencies": {
-    "react": "^19.1",
-    "react-dom": "^19.1"
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1"
   },
   "dependencies": {
     "@unicode/unicode-17.0.0": "^1.6.16",
