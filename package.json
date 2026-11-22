@@ -1,5 +1,5 @@
 {
-  "name": "unicode",
+  "name": "@mosdev/unicode",
   "description": "Unicode utilities.",
   "version": "1.0.1",
   "author": "Joost Lubach",
